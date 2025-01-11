@@ -2,7 +2,10 @@ import React, { useState } from "react";
 import PhotoViewer from './../PhotoViewer'
 import { ReactionButton,CommentButton,ShareButton } from "../Buttons";
 
-const PhotoGallery: React.FC<{ imageUrl: string }> = ({ imageUrl }) => {
+const PhotoGallery: React.FC = () => {
+    
+    // get img details from an api
+    
     const colorList = ['red', 'blue', 'yellow', 'red', 'blue', 'yellow', 'red', 'blue', 'yellow', 'red', 'blue', 'yellow', 'red', 'blue', 'yellow', 'red', 'blue', 'yellow'];
     
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -52,15 +55,15 @@ const PhotoGallery: React.FC<{ imageUrl: string }> = ({ imageUrl }) => {
                         onClick={() => openModal(color)}
                     />
                     <div className="grid grid-cols-3 gap-4">
-                        <div className="...">
+                        <div className="col-end-4 text-right">
                             <ReactionButton isLiked={likedIndexList.includes(index)} onToggle={() => likePhoto(index)} key={index}/>
                         </div>
-                        <div className="...">
+                        {/* <div className="...">
                             <CommentButton onClick={() => console.log("Hi")} key={index}/>
                         </div>
                         <div className="...">
                             <ShareButton onClick={() => console.log("Hi")} key={index}/>
-                        </div>
+                        </div> */}
                     </div>
                 </div>
             ))}

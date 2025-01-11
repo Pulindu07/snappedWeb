@@ -1,19 +1,25 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import { ReactionButton, CommentButton, ShareButton } from './components/Buttons'
-import PhotoGallery from './components/PhotoGallery'
-import './App.css'
+import { ReactionButton, CommentButton, ShareButton } from './components/Buttons';
+import PhotoGallery from './components/PhotoGallery';
+import './App.css';
+import Header from './components/Header';
+import Footer from './components/Footer';
+import Main from './components/Main';
 
 function App() {
-
   return (
-    <div className="App">
-      <div className="text-3xl font-bold text-blue-600">
-        Hello world!!!
-        <PhotoGallery imageUrl = 'test'/>
-      </div>
+    <div className="App flex flex-col min-h-screen">
+      {/* Header */}
+      <Header />
+      
+
+      {/* Main Content */}
+      <Main />
+
+      {/* Footer */}
+      <Footer />
+      
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
