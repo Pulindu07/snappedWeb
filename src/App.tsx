@@ -1,24 +1,31 @@
-import { ReactionButton, CommentButton, ShareButton } from './components/Buttons';
-import PhotoGallery from './components/PhotoGallery';
-import './App.css';
-import Header from './components/Header';
-import Footer from './components/Footer';
-import Main from './components/Main';
+
+import "./App.css";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
+import Main from "./components/Main";
+import { Provider } from "react-redux";
+import { store } from "./redux/store"; // Import store
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 function App() {
   return (
-    <div className="App flex flex-col min-h-screen">
-      {/* Header */}
-      <Header />
-      
+    <Provider store={store}>
+      <Router>
+        <div className="App flex flex-col min-h-screen">
+          {/* Header */}
+          <Header />
+          {/* Main Content */}
+          <Main />
 
-      {/* Main Content */}
-      <Main />
-
-      {/* Footer */}
-      <Footer />
-      
-    </div>
+          {/* Routes */}
+          <Routes>
+            <Route path={"/"} element={<Main />} />
+          </Routes>
+          {/* Footer */}
+          <Footer />
+        </div>
+      </Router>
+    </Provider>
   );
 }
 

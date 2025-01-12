@@ -4,9 +4,14 @@ import { ReactionButton, CommentButton, ShareButton } from "../Buttons";
 import { sampleImgList } from "../../utils/samples";
 import { GridPhoto } from "../../utils/types";
 
-const PhotoGallery: React.FC = () => {
+interface PhotoGalleryProps {
+  photos: GridPhoto[]; // Array of GridPhoto objects
+}
+
+const PhotoGallery: React.FC<PhotoGalleryProps> = ({ photos }) => {
   // TODO:: get img details from an api
 
+  console.log(sampleImgList);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [imgItem, setImgItem] = useState<GridPhoto | null>(null);
   const [imgItems, setImgItems] = useState<GridPhoto[]>(sampleImgList);
