@@ -1,80 +1,82 @@
 import React, { useState } from "react";
-import PhotoViewer from './../PhotoViewer'
-import { ReactionButton,CommentButton,ShareButton } from "../Buttons";
+import PhotoViewer from "./../PhotoViewer";
+import { ReactionButton, CommentButton, ShareButton } from "../Buttons";
+import { getBackgroundColorClass } from "../../utils/helper";
+import { colorList, description } from "../../utils/samples";
+import { GridPhoto } from "../../utils/types";
 
 const PhotoGallery: React.FC = () => {
-    
-    // get img details from an api
-    
-    const colorList = ['red', 'blue', 'yellow', 'red', 'blue', 'yellow', 'red', 'blue', 'yellow', 'red', 'blue', 'yellow', 'red', 'blue', 'yellow', 'red', 'blue', 'yellow'];
-    
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [modalColor, setModalColor] = useState(colorList[0]);
-    const [likedIndexList, setLikedIndexList] = useState<number[]>([]); // Track the index of the liked button
+  // TODO:: get img details from an api
 
-  
-    const openModal = (color: string) => {
-        setIsModalOpen(true);
-        setModalColor(color);
-    };
-    const closeModal = () => setIsModalOpen(false);
-    const likePhoto = (index: number) => {
-            if(likedIndexList.includes(index)){
-                const tempList = likedIndexList.filter((ele)=> ele != index)
-                setLikedIndexList(tempList)
-            }else{
-                const tempList = likedIndexList.concat(index);
-                setLikedIndexList(tempList)
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [imgItem, setImgItem] = useState<GridPhoto | null>(null);
 
-            }
-        };
+  const [likedIndexList, setLikedIndexList] = useState<number[]>([]); // Track the index of the liked button
 
-    // Helper function to get the correct background color class
-    const getBackgroundColorClass = (color: string) => {
-        switch (color) {
-            case 'red':
-                return 'bg-red-500';
-            case 'blue':
-                return 'bg-blue-500';
-            case 'yellow':
-                return 'bg-yellow-500';
-            default:
-                return 'bg-gray-500';
-        }
-    };
-  
-    return (
-        <div className="grid grid-cols-3 gap-4">
-            {colorList.map((color, index) => (
-                <div
-                    key={index}
-                    className="cursor-pointer w-[400px] h-[400px]"
-                >
-                    <div
-                        className={`w-[400px] h-[350px] ${getBackgroundColorClass(color)} rounded-lg shadow-md`}
-                        onClick={() => openModal(color)}
-                    />
-                    <div className="grid grid-cols-3 gap-4">
-                        <div className="col-end-4 text-right">
-                            <ReactionButton isLiked={likedIndexList.includes(index)} onToggle={() => likePhoto(index)} key={index}/>
-                        </div>
-                        {/* <div className="...">
+  const openModal = (item: GridPhoto) => {
+    setIsModalOpen(true);
+    setImgItem({
+      id: item.id,
+      fileName: item.fileName,
+      url: item.url,
+      prevUrl: item.prevUrl,
+      likeCount: item.likeCount,
+      description: item.description,
+    });
+  };
+  const closeModal = () => setIsModalOpen(false);
+  const likePhoto = (index: number) => {
+    if (likedIndexList.includes(index)) {
+      const tempList = likedIndexList.filter((ele) => ele != index);
+      setLikedIndexList(tempList);
+    } else {
+      const tempList = likedIndexList.concat(index);
+      setLikedIndexList(tempList);
+    }
+  };
+
+  return (
+    <div className="grid grid-cols-3 gap-4">
+      {colorList.map((item, index) => (
+        <div key={index} className="cursor-pointer w-[400px] h-[370px]">
+          <img
+            className="w-[400px] h-[350px] rounded-lg shadow-md object-cover"
+            src={item.prevUrl}
+            alt=""
+            onClick={() => openModal(item)}
+          />
+          <div className="grid grid-cols-3 gap-4">
+            <div className="col-end-4 text-right">
+              <ReactionButton
+                isLiked={likedIndexList.includes(index)}
+                onToggle={() => likePhoto(index)}
+                key={index}
+              />
+              {item.likeCount}
+            </div>
+            {/* <div className="...">
                             <CommentButton onClick={() => console.log("Hi")} key={index}/>
                         </div>
                         <div className="...">
                             <ShareButton onClick={() => console.log("Hi")} key={index}/>
                         </div> */}
-                    </div>
-                </div>
-            ))}
-
-            <PhotoViewer isOpen={isModalOpen} onClose={closeModal}>
-                <div 
-                    className={`w-full h-full ${getBackgroundColorClass(modalColor)} rounded-lg shadow-md`}
-                />
-            </PhotoViewer>
+          </div>
         </div>
-    );
+      ))}
+
+      <PhotoViewer isOpen={isModalOpen} onClose={closeModal}>
+        <img
+            className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-lg shadow-md"
+            src={imgItem?.url}
+            alt=""
+            style={{
+            maxWidth: "calc(100vw - 100px)",
+            maxHeight: "calc(100vh - 100px)",
+            }}
+        />
+      </PhotoViewer>
+    </div>
+  );
 };
 
 export default PhotoGallery;

@@ -4,7 +4,11 @@ export default {
     "./src/**/*.{js,jsx,ts,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        kalam: ["Kalam", "sans-serif"],
+      },
+    },
   },
   plugins: [],
 }
