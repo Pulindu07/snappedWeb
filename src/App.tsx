@@ -14,9 +14,6 @@ function App() {
         <div className="App flex flex-col min-h-screen">
           {/* Header */}
           <Header />
-          {/* Main Content */}
-          <Main />
-
           {/* Routes */}
           <Routes>
             <Route path={"/"} element={<Main />} />

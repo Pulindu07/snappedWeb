@@ -1,16 +1,22 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
 import { GridPhoto } from '../utils/types';
-import config from './../config.json'
-
-const API_URL = config.API_URL;
+import { fetchPaginatedPhotos } from '../services/GetPhotoService';
 
 
-export const fetchPhotos = createAsyncThunk(
+
+interface FetchPhotosPayload {
+  photos: GridPhoto[];
+  hasMore: boolean;
+  currentPage:number;
+  totalCount:number;
+  totalPages:number
+}
+
+export const fetchPhotos = createAsyncThunk<FetchPhotosPayload, number>(
   'photos/fetchPhotos',
   async (page: number) => {
-    const response = await axios.get(`${API_URL}/photos?page=${page}`);
-    return response.data; // Assume the API returns { items: GridPhoto[], hasMore: boolean }
+    const response = await fetchPaginatedPhotos(page);
+    return response;
   }
 );
 
@@ -41,7 +47,7 @@ const apiSlice = createSlice({
       })
       .addCase(fetchPhotos.fulfilled, (state, action) => {
         state.loading = false;
-        state.photos = [...state.photos, ...action.payload.items];
+        state.photos = [...state.photos, ...action.payload.photos];
         state.hasMore = action.payload.hasMore;
         state.currentPage += 1;
       })

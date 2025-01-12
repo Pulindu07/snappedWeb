@@ -6,17 +6,16 @@ import { GridPhoto } from "../../utils/types";
 
 interface PhotoGalleryProps {
   photos: GridPhoto[]; // Array of GridPhoto objects
+  lastPhotoRef: React.MutableRefObject<HTMLDivElement | null>;
 }
 
-const PhotoGallery: React.FC<PhotoGalleryProps> = ({ photos }) => {
+const PhotoGallery = ({ photos, lastPhotoRef }: PhotoGalleryProps) => {
   // TODO:: get img details from an api
 
-  console.log(sampleImgList);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [imgItem, setImgItem] = useState<GridPhoto | null>(null);
-  const [imgItems, setImgItems] = useState<GridPhoto[]>(sampleImgList);
 
-  const [likedIndexList, setLikedIndexList] = useState<number[]>([]); // Track the index of the liked button
+  const [likedIndexList, setLikedIndexList] = useState<string[]>([]); // Track the index of the liked button
 
   const openModal = (item: GridPhoto) => {
     setIsModalOpen(true);
@@ -30,44 +29,25 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ photos }) => {
     });
   };
   const closeModal = () => setIsModalOpen(false);
-  const likePhoto = (index: number) => {
+  
+  const likePhoto = (index: string) => {
     if (likedIndexList.includes(index)) {
       const tempList = likedIndexList.filter((ele) => ele != index);
       setLikedIndexList(tempList);
-      setImgItems(()=> {
-        const updatedList = [...imgItems];
-        updatedList[index] = {
-            id: updatedList[index].id,
-            fileName: updatedList[index].fileName,
-            url: updatedList[index].url,
-            prevUrl: updatedList[index].prevUrl,
-            likeCount: updatedList[index].likeCount-1,
-            description: updatedList[index].description,
-        }
-        return updatedList;
-      })
     } else {
       const tempList = likedIndexList.concat(index);
       setLikedIndexList(tempList);
-      setImgItems(()=> {
-        const updatedList = [...imgItems];
-        updatedList[index] = {
-            id: updatedList[index].id,
-            fileName: updatedList[index].fileName,
-            url: updatedList[index].url,
-            prevUrl: updatedList[index].prevUrl,
-            likeCount: updatedList[index].likeCount+1,
-            description: updatedList[index].description,
-        }
-        return updatedList;
-      })
     }
   };
 
   return (
     <div className="grid grid-cols-3 gap-4">
-      {imgItems.map((item, index) => (
-        <div key={index} className="cursor-pointer w-[400px] h-[370px]">
+      {photos.map((item, index) => (
+        <div  
+          className="cursor-pointer w-[400px] h-[370px]"
+          key={index}
+          ref={index === photos.length - 1 ? lastPhotoRef : null} // Set ref to the last photo
+        >
           <img
             className="w-[400px] h-[350px] rounded-lg shadow-md object-cover"
             src={item.prevUrl}
@@ -77,8 +57,8 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ photos }) => {
           <div className="grid grid-cols-3 gap-4">
             <div className="col-end-4 text-right">
               <ReactionButton
-                isLiked={likedIndexList.includes(index)}
-                onToggle={() => likePhoto(index)}
+                isLiked={likedIndexList.includes(item.id)}
+                onToggle={() => likePhoto(item.id)}
                 key={index}
               />
               {item.likeCount > 0 ? item.likeCount : null}
