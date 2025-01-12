@@ -5,8 +5,6 @@ import { description } from "../../utils/samples";
 const Header = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const [likedIndexList, setLikedIndexList] = useState<number[]>([]); // Track the index of the liked button
-
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 

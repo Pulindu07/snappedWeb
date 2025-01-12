@@ -1,4 +1,4 @@
-export const colorList = [
+export const sampleImgList = [
   {
     id: "000001",
     url: "/src/assets/samples/a.png",
