@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import PhotoViewer from "./../PhotoViewer";
 import { ReactionButton, CommentButton, ShareButton } from "../Buttons";
-import { sampleImgList } from "../../utils/samples";
 import { GridPhoto } from "../../utils/types";
 
 interface PhotoGalleryProps {
@@ -10,12 +9,14 @@ interface PhotoGalleryProps {
 }
 
 const PhotoGallery = ({ photos, lastPhotoRef }: PhotoGalleryProps) => {
-  // TODO:: get img details from an api
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [imgItem, setImgItem] = useState<GridPhoto | null>(null);
 
-  const [likedIndexList, setLikedIndexList] = useState<string[]>([]); // Track the index of the liked button
+  const [likedIdList, setLikedIdList] = useState<string[]>(() => {
+    const storedLikes = localStorage.getItem("likedPhotoIds");
+    return storedLikes ? JSON.parse(storedLikes) : [];
+  });
 
   const openModal = (item: GridPhoto) => {
     setIsModalOpen(true);
@@ -30,15 +31,19 @@ const PhotoGallery = ({ photos, lastPhotoRef }: PhotoGalleryProps) => {
   };
   const closeModal = () => setIsModalOpen(false);
   
-  const likePhoto = (index: string) => {
-    if (likedIndexList.includes(index)) {
-      const tempList = likedIndexList.filter((ele) => ele != index);
-      setLikedIndexList(tempList);
+  const likePhoto = (receivedId: string) => {
+    let tempList: string[];
+    if (likedIdList.includes(receivedId)) {
+      tempList = likedIdList.filter((id) => id !== receivedId);
     } else {
-      const tempList = likedIndexList.concat(index);
-      setLikedIndexList(tempList);
+      tempList = [...likedIdList, receivedId];
     }
+    setLikedIdList(tempList);
+    localStorage.setItem("likedPhotoIds", JSON.stringify(tempList));
   };
+  useEffect(() => {
+    localStorage.setItem("likedPhotoIds", JSON.stringify(likedIdList));
+  }, [likedIdList]);
 
   return (
     <div className="grid grid-cols-3 gap-4">
@@ -57,18 +62,11 @@ const PhotoGallery = ({ photos, lastPhotoRef }: PhotoGalleryProps) => {
           <div className="grid grid-cols-3 gap-4">
             <div className="col-end-4 text-right">
               <ReactionButton
-                isLiked={likedIndexList.includes(item.id)}
+                isLiked={likedIdList.includes(item.id)}
                 onToggle={() => likePhoto(item.id)}
                 key={index}
               />
-              {item.likeCount > 0 ? item.likeCount : null}
             </div>
-            {/* <div className="...">
-                            <CommentButton onClick={() => console.log("Hi")} key={index}/>
-                        </div>
-                        <div className="...">
-                            <ShareButton onClick={() => console.log("Hi")} key={index}/>
-                        </div> */}
           </div>
         </div>
       ))}
