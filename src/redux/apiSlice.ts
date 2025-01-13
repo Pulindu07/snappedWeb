@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { GridPhoto } from '../utils/types';
 import { fetchPaginatedPhotos } from '../services/GetPhotoService';
+import { encodeBase64, decodeBase64 } from '../utils/helper';
 
 
 
@@ -16,6 +17,13 @@ export const fetchPhotos = createAsyncThunk<FetchPhotosPayload, number>(
   'photos/fetchPhotos',
   async (page: number) => {
     const response = await fetchPaginatedPhotos(page);
+    if(response.photos.length>0){
+      response.photos.forEach(element => {
+          element.prevUrl=decodeBase64(element.prevUrl);
+          element.url=decodeBase64(element.url);
+      });
+    }
+    console.log(response.photos[0].url);
     return response;
   }
 );
