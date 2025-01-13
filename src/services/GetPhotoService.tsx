@@ -16,3 +16,11 @@ export const fetchPaginatedPhotos = async (page: number): Promise<FetchPhotosRes
   const response = await axios.get(`${API_URL}/getPhotos?page=${page}`);
   return response.data; // Ensure this matches the API's response format
 };
+
+export const likePhoto = async (id:number, hasLiked:boolean) => {
+  const response = await axios.put(`${API_URL}/likePhoto`, {
+    id,
+    hasLiked,
+  });
+  return response.data; // Returns the server's response
+};

@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { GridPhoto } from '../utils/types';
-import { fetchPaginatedPhotos } from '../services/GetPhotoService';
+import { fetchPaginatedPhotos, likePhoto } from '../services/GetPhotoService';
 import { encodeBase64, decodeBase64 } from '../utils/helper';
 
 
@@ -13,6 +13,17 @@ interface FetchPhotosPayload {
   totalPages:number
 }
 
+interface FetchLikePhotoPayload {
+  Id: number;
+  HasLike: boolean;
+  LikeCount:number;
+}
+
+interface LikePhotoRequest {
+  id: number;
+  hasLiked: boolean;
+}
+
 export const fetchPhotos = createAsyncThunk<FetchPhotosPayload, number>(
   'photos/fetchPhotos',
   async (page: number) => {
@@ -23,7 +34,14 @@ export const fetchPhotos = createAsyncThunk<FetchPhotosPayload, number>(
           element.url=decodeBase64(element.url);
       });
     }
-    console.log(response.photos[0].url);
+    return response;
+  }
+);
+
+export const fetchLikedPhoto = createAsyncThunk<FetchLikePhotoPayload, LikePhotoRequest>(
+  'photos/fetchLikedPhotos',
+  async ({id, hasLiked}) => {
+    const response = await likePhoto(id,hasLiked);
     return response;
   }
 );

@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import PhotoViewer from "./../PhotoViewer";
 import { ReactionButton, CommentButton, ShareButton } from "../Buttons";
-import { GridPhoto } from "../../utils/types";
+import { GridPhoto, Photo } from "../../utils/types";
+import { fetchLikedPhoto } from "../../redux/apiSlice";
+import { useAppDispatch } from "../../redux/hooks";
 
 interface PhotoGalleryProps {
   photos: GridPhoto[]; // Array of GridPhoto objects
@@ -9,9 +11,11 @@ interface PhotoGalleryProps {
 }
 
 const PhotoGallery = ({ photos, lastPhotoRef }: PhotoGalleryProps) => {
+  const dispatch = useAppDispatch();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [imgItem, setImgItem] = useState<GridPhoto | null>(null);
+  const [likeCount, setLikeCount] = useState<number | null>(null);
 
   const [likedIdList, setLikedIdList] = useState<string[]>(() => {
     const storedLikes = localStorage.getItem("likedPhotoIds");
@@ -35,8 +39,10 @@ const PhotoGallery = ({ photos, lastPhotoRef }: PhotoGalleryProps) => {
     let tempList: string[];
     if (likedIdList.includes(receivedId)) {
       tempList = likedIdList.filter((id) => id !== receivedId);
+      dispatch(fetchLikedPhoto({id: parseInt(receivedId) , hasLiked: false}));
     } else {
       tempList = [...likedIdList, receivedId];
+      dispatch(fetchLikedPhoto({id: parseInt(receivedId) , hasLiked: true}));
     }
     setLikedIdList(tempList);
     localStorage.setItem("likedPhotoIds", JSON.stringify(tempList));
