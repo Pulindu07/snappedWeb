@@ -23,16 +23,13 @@ const PhotoViewer: React.FC<{ isOpen: boolean, onClose: () => void, children: Re
 
     return (
       <div 
-        className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-md" 
+        className="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-md" 
         onClick={onClose}
       >
         <div 
-          className="bg-transparent rounded-lg shadow-lg w-[600px] h-[600px]"
+          className="bg-transparent rounded-lg shadow-lg"
           onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the modal
         >
-          <div className="flex justify-end p-2">
-            
-          </div>
           <div className="w-full h-full">{children}</div>
         </div>
       </div>
