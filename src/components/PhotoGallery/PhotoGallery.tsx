@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import PhotoViewer from "./../PhotoViewer";
-import { ReactionButton, CommentButton, ShareButton } from "../Buttons";
-import { GridPhoto, Photo } from "../../utils/types";
+import { ReactionButton } from "../Buttons";
+import { GridPhoto } from "../../utils/types";
 import { fetchLikedPhoto } from "../../redux/apiSlice";
 import { useAppDispatch } from "../../redux/hooks";
 
@@ -12,40 +12,36 @@ interface PhotoGalleryProps {
 
 const PhotoGallery = ({ photos, lastPhotoRef }: PhotoGalleryProps) => {
   const dispatch = useAppDispatch();
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [imgItem, setImgItem] = useState<GridPhoto | null>(null);
-  const [likeCount, setLikeCount] = useState<number | null>(null);
-
   const [likedIdList, setLikedIdList] = useState<string[]>(() => {
     const storedLikes = localStorage.getItem("likedPhotoIds");
     return storedLikes ? JSON.parse(storedLikes) : [];
   });
 
+  const [activePopover, setActivePopover] = useState<string | null>(null);
+
   const openModal = (item: GridPhoto) => {
     setIsModalOpen(true);
-    setImgItem({
-      id: item.id,
-      fileName: item.fileName,
-      url: item.url,
-      prevUrl: item.prevUrl,
-      likeCount: item.likeCount,
-      description: item.description,
-    });
+    setImgItem(item);
   };
+
   const closeModal = () => setIsModalOpen(false);
-  
-  const likePhoto = (receivedId: string) => {
-    let tempList: string[];
-    if (likedIdList.includes(receivedId)) {
-      tempList = likedIdList.filter((id) => id !== receivedId);
-      dispatch(fetchLikedPhoto({id: parseInt(receivedId) , hasLiked: false}));
-    } else {
-      tempList = [...likedIdList, receivedId];
-      dispatch(fetchLikedPhoto({id: parseInt(receivedId) , hasLiked: true}));
+
+  const likePhoto = async (receivedId: string) => {
+    const isLiked = likedIdList.includes(receivedId);
+    try {
+      await dispatch(fetchLikedPhoto({ id: parseInt(receivedId), hasLiked: !isLiked }));
+
+      const updatedLikedIdList = isLiked
+        ? likedIdList.filter((id) => id !== receivedId)
+        : [...likedIdList, receivedId];
+
+      setLikedIdList(updatedLikedIdList);
+      localStorage.setItem("likedPhotoIds", JSON.stringify(updatedLikedIdList));
+    } catch (error) {
+      console.error("Error updating like status:", error);
     }
-    setLikedIdList(tempList);
-    localStorage.setItem("likedPhotoIds", JSON.stringify(tempList));
   };
 
   useEffect(() => {
@@ -55,25 +51,42 @@ const PhotoGallery = ({ photos, lastPhotoRef }: PhotoGalleryProps) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-4 md:px-6 lg:px-8">
       {photos.map((item, index) => (
-        <div  
+        <div
           className="cursor-pointer w-full"
-          key={index}
+          key={item.id}
           ref={index === photos.length - 1 ? lastPhotoRef : null}
+          onMouseEnter={() => setActivePopover(item.id)} // Show popover on hover
+          onMouseLeave={() => setActivePopover(null)} // Hide popover when hover ends
         >
-          <div data-popover-target="popover-default" className="aspect-square w-full relative">
+          <div className="aspect-square w-full relative">
             <img
               className="w-full h-full rounded-lg shadow-md object-cover"
               src={item.prevUrl}
               alt=""
               onClick={() => openModal(item)}
             />
-            <div className="absolute bottom-4 right-4">
+            <div className="absolute bottom-4 right-4 flex items-center space-x-2">
               <ReactionButton
                 isLiked={likedIdList.includes(item.id)}
                 onToggle={() => likePhoto(item.id)}
-                key={index}
               />
             </div>
+
+            {/* Popover */}
+            {activePopover === item.id && (
+              <div
+                id={`popover-${item.id}`}
+                role="tooltip"
+                className="absolute z-10 bottom-[-1] w-full text-sm text-gray-500 bg-white border border-gray-200 rounded-lg shadow-sm"
+              >
+                <div className="px-3 py-2 bg-gray-100 border-b border-gray-200 rounded-t-lg">
+                  <h3 className="font-semibold text-gray-900">{item.fileName}</h3>
+                </div>
+                <div className="px-3 py-2">
+                  <p>{item.description}</p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       ))}
@@ -85,16 +98,6 @@ const PhotoGallery = ({ photos, lastPhotoRef }: PhotoGalleryProps) => {
           alt=""
         />
       </PhotoViewer>
-
-      <div data-popover id="popover-default" role="tooltip" className="absolute z-10 invisible inline-block w-64 text-sm text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 dark:text-gray-400 dark:border-gray-600 dark:bg-gray-800">
-        <div className="px-3 py-2 bg-gray-100 border-b border-gray-200 rounded-t-lg dark:border-gray-600 dark:bg-gray-700">
-            <h3 className="font-semibold text-gray-900 dark:text-white">Popover title</h3>
-        </div>
-        <div className="px-3 py-2">
-            <p>And here's some amazing content. It's very engaging. Right?</p>
-        </div>
-        <div data-popper-arrow></div>
-      </div>
     </div>
   );
 };
