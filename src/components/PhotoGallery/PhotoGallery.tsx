@@ -21,6 +21,18 @@ const PhotoGallery = ({ photos, lastPhotoRef }: PhotoGalleryProps) => {
 
   const [activePopover, setActivePopover] = useState<string | null>(null);
 
+  // Add state for tracking like counts
+  const [likeCounts, setLikeCounts] = useState<Record<string, number>>({});
+
+  // Initialize like counts from props
+  useEffect(() => {
+    const initialCounts: Record<string, number> = {};
+    photos.forEach(photo => {
+      initialCounts[photo.id] = photo.likeCount;
+    });
+    setLikeCounts(initialCounts);
+  }, [photos]);
+
   const openModal = (item: GridPhoto) => {
     setIsModalOpen(true);
     setImgItem(item);
@@ -33,11 +45,18 @@ const PhotoGallery = ({ photos, lastPhotoRef }: PhotoGalleryProps) => {
     try {
       await dispatch(fetchLikedPhoto({ id: parseInt(receivedId), hasLiked: !isLiked }));
 
+      // Update liked IDs list
       const updatedLikedIdList = isLiked
         ? likedIdList.filter((id) => id !== receivedId)
         : [...likedIdList, receivedId];
-
       setLikedIdList(updatedLikedIdList);
+
+      // Update like count immediately
+      setLikeCounts(prev => ({
+        ...prev,
+        [receivedId]: prev[receivedId] + (isLiked ? -1 : 1)
+      }));
+
       localStorage.setItem("likedPhotoIds", JSON.stringify(updatedLikedIdList));
     } catch (error) {
       console.error("Error updating like status:", error);
@@ -55,8 +74,8 @@ const PhotoGallery = ({ photos, lastPhotoRef }: PhotoGalleryProps) => {
           className="cursor-pointer w-full"
           key={item.id}
           ref={index === photos.length - 1 ? lastPhotoRef : null}
-          onMouseEnter={() => setActivePopover(item.id)} // Show popover on hover
-          onMouseLeave={() => setActivePopover(null)} // Hide popover when hover ends
+          onMouseEnter={() => setActivePopover(item.id)}
+          onMouseLeave={() => setActivePopover(null)}
         >
           <div className="aspect-square w-full relative">
             <img
@@ -70,9 +89,9 @@ const PhotoGallery = ({ photos, lastPhotoRef }: PhotoGalleryProps) => {
                 isLiked={likedIdList.includes(item.id)}
                 onToggle={() => likePhoto(item.id)}
               />
+              {likeCounts[item.id] || null}
             </div>
 
-            {/* Popover */}
             {activePopover === item.id && (
               <div
                 id={`popover-${item.id}`}

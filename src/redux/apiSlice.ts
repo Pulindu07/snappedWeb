@@ -2,8 +2,9 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { GridPhoto } from '../utils/types';
 import { fetchPaginatedPhotos, likePhoto } from '../services/GetPhotoService';
 import { encodeBase64, decodeBase64 } from '../utils/helper';
+import {DEFAULT_PAGE_SIZE} from './../config.json';
 
-
+const pageSize = DEFAULT_PAGE_SIZE;
 
 interface FetchPhotosPayload {
   photos: GridPhoto[];
@@ -27,7 +28,7 @@ interface LikePhotoRequest {
 export const fetchPhotos = createAsyncThunk<FetchPhotosPayload, number>(
   'photos/fetchPhotos',
   async (page: number) => {
-    const response = await fetchPaginatedPhotos(page);
+    const response = await fetchPaginatedPhotos(page, pageSize);
     if(response.photos.length>0){
       response.photos.forEach(element => {
           element.prevUrl=decodeBase64(element.prevUrl);

@@ -12,8 +12,8 @@ interface FetchPhotosResponse {
   totalPages: number;
 }
 
-export const fetchPaginatedPhotos = async (page: number): Promise<FetchPhotosResponse> => {
-  const response = await axios.get(`${API_URL}/getPhotos?page=${page}`);
+export const fetchPaginatedPhotos = async (page: number, pageSize:number): Promise<FetchPhotosResponse> => {
+  const response = await axios.get(`${API_URL}/getPhotos?page=${page}&pageSize=${pageSize}`);
   return response.data; // Ensure this matches the API's response format
 };
 

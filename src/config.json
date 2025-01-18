@@ -1,5 +1,6 @@
 {
     "API_URL": "http://localhost:5237/api",
-    "ENCRYPTION_KEY":"sdkjbsd@123SDJEdnneWendndW3edndk"
+    "ENCRYPTION_KEY":"sdkjbsd@123SDJEdnneWendndW3edndk",
+    "DEFAULT_PAGE_SIZE":6
 }
   
