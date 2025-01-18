@@ -28,7 +28,7 @@ interface LikePhotoRequest {
 export const fetchPhotos = createAsyncThunk<FetchPhotosPayload, number>(
   'photos/fetchPhotos',
   async (page: number) => {
-    const response = await fetchPaginatedPhotos(page, pageSize);
+    const response = await fetchPaginatedPhotos(page);
     if(response.photos.length>0){
       response.photos.forEach(element => {
           element.prevUrl=decodeBase64(element.prevUrl);
