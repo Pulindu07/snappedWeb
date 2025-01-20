@@ -121,5 +121,4 @@ const PhotoGallery = ({ photos, lastPhotoRef }: PhotoGalleryProps) => {
   );
 };
 
-
 export default PhotoGallery;
