@@ -23,9 +23,11 @@ const chatSlice = createSlice({
   reducers: {
     addUserMessage: (state, action: PayloadAction<string>) => {
       state.messages.push({ role: "user", content: action.payload });
+      state.loading=true;
     },
     addBotMessage: (state, action: PayloadAction<string>) => {
       state.messages.push({ role: "bot", content: action.payload });
+      state.loading=false;
     },
     clearChat: (state) => {
       state.messages = [];

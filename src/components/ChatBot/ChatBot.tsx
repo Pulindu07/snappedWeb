@@ -3,6 +3,8 @@ import { HubConnectionBuilder, HubConnectionState, HttpTransportType } from "@mi
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "./../../redux/store";
 import { addUserMessage, addBotMessage } from "./../../redux/chatSlice";
+import { SendButton, CloseButton } from "../Buttons";
+import LoadingDots from "../LoadingDots";
 
 const ChatBot: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -51,15 +53,20 @@ const ChatBot: React.FC = () => {
 
   const handleSendMessage = async () => {
     if (input.trim() && connection) {
+      let tempInput = input;
+      setInput("");
       try {
-        dispatch(addUserMessage(input));
-        await connection.invoke("SendMessage", input, "conversation-1");
-        setInput("");
+        dispatch(addUserMessage(tempInput));
+        await connection.invoke("SendMessage", tempInput, "conversation-1");
       } catch (error) {
         console.error("Message send error:", error);
       }
     }
   };
+
+  const closeChat=()=>{
+    setIsChatVisible(false)
+  }
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -99,13 +106,8 @@ const ChatBot: React.FC = () => {
       ) : (
         <div className="bg-white rounded-lg border border-gray-200">
           <div className="flex justify-between items-center p-3 bg-blue-500 text-white rounded-t-lg">
-            <h3 className="text-lg font-semibold">ChatBot</h3>
-            <button 
-              onClick={() => setIsChatVisible(false)}
-              className="hover:bg-blue-600 p-1 rounded"
-            >
-              X
-            </button>
+            <h3 className="text-lg font-semibold">Snap Bot</h3>
+            <CloseButton handleCloseChat={closeChat} />
           </div>
 
           <div className="h-[300px] overflow-y-auto p-3 space-y-2">
@@ -122,7 +124,7 @@ const ChatBot: React.FC = () => {
               </div>
             ))}
             {loading && (
-              <div className="text-gray-500 italic text-center">Typing...</div>
+              <LoadingDots />
             )}
             <div ref={messagesEndRef} />
           </div>
@@ -134,15 +136,9 @@ const ChatBot: React.FC = () => {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
               placeholder="Type a message..."
-              className="flex-grow p-2 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-300"
+              className="flex-grow p-3 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-300 transition-all mr-1"
             />
-            <button 
-              onClick={handleSendMessage} 
-              disabled={loading}
-              className="bg-blue-500 text-white p-2 rounded-r-lg hover:bg-blue-600 disabled:opacity-50"
-            >
-              Send
-            </button>
+              <SendButton handleSendMessage={handleSendMessage} loading={loading} />
           </div>
         </div>
       )}

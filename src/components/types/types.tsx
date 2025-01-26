@@ -1,7 +1,15 @@
 export interface ReactionButtonProps{
     isLiked: boolean;
     onToggle: () => void;
-  }
+}
+
+export interface SendButtonProps{
+  handleSendMessage: () => void;
+  loading: boolean;
+}
+export interface CloseButtonProps{
+  handleCloseChat: () => void;
+}
 
 export interface CommentButtonProps extends ButtonProps {
     
