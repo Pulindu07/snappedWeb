@@ -27,7 +27,8 @@ const PhotoGallery = ({ photos, lastPhotoRef }: PhotoGalleryProps) => {
           item={item} 
           index={index} 
           setIsModalOpen={setIsModalOpen}
-          setImgItem={setImgItem} 
+          setImgItem={setImgItem}
+          key={index}
         />
       ))}
 

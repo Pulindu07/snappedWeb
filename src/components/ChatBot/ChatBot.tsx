@@ -26,7 +26,8 @@ const ChatBot: React.FC = () => {
         const hubConnection = new HubConnectionBuilder()
           .withUrl(`${configProcess.BASE_API_URL}/chat-bot`, {
             skipNegotiation: true,
-            transport: HttpTransportType.WebSockets
+            transport: HttpTransportType.WebSockets,
+            withCredentials: true
           })
           .withAutomaticReconnect()
           .build();
