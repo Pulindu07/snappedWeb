@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const configProcess = {
-    API_URL: import.meta.env.VITE_API_URL,
+    API_URL: import.meta.env.VITE_BASE_API_URL,
     DEFAULT_PAGE_SIZE: Number(import.meta.env.VITE_DEFAULT_PAGE_SIZE)
   };
 
