@@ -4,6 +4,7 @@ import { ReactionButton } from "../Buttons";
 import { GridPhoto } from "../../utils/types";
 import { fetchLikedPhoto } from "../../redux/apiSlice";
 import { useAppDispatch } from "../../redux/hooks";
+import ChatBot from "../ChatBot/index";
 
 interface PhotoGalleryProps {
   photos: GridPhoto[];
@@ -117,6 +118,8 @@ const PhotoGallery = ({ photos, lastPhotoRef }: PhotoGalleryProps) => {
           alt=""
         />
       </PhotoViewer>
+
+      <ChatBot />
     </div>
   );
 };
