@@ -1,5 +1,6 @@
 {
     "API_URL": "http://localhost:5237/api",
     "DEFAULT_PAGE_SIZE":6
+    
 }
   
