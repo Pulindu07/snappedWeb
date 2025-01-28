@@ -1,10 +1,12 @@
 import React, { useEffect, useState, useRef } from "react";
 import { HubConnectionBuilder, HubConnectionState, HttpTransportType } from "@microsoft/signalr";
 import { useDispatch, useSelector } from "react-redux";
+import ReactMarkdown from 'react-markdown';
 import { RootState, AppDispatch } from "./../../redux/store";
 import { addUserMessage, addBotMessage } from "./../../redux/chatSlice";
 import { SendButton, CloseButton } from "../Buttons";
 import LoadingDots from "../LoadingDots";
+import Markdown from "react-markdown";
 
 const ChatBot: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -120,7 +122,7 @@ const ChatBot: React.FC = () => {
                     : "bg-gray-100 mr-auto text-left"
                 }`}
               >
-                {msg.content}
+                <Markdown>{msg.content}</Markdown>
               </div>
             ))}
             {loading && (
