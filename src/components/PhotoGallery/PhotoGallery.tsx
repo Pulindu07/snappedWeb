@@ -39,7 +39,7 @@ const PhotoGallery = ({ photos, lastPhotoRef }: PhotoGalleryProps) => {
         />
       </PhotoViewer>
 
-      <ChatBot />
+      {/* <ChatBot /> */}
     </div>
   );
 };
