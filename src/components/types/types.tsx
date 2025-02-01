@@ -11,6 +11,10 @@ export interface CloseButtonProps{
   handleCloseChat: () => void;
 }
 
+export interface HomeButtonProps{
+  handleGoHome: () => void;
+}
+
 export interface CommentButtonProps extends ButtonProps {
     
 }

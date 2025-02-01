@@ -1,11 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import PhotoViewer from "./../PhotoViewer";
-import { ReactionButton } from "../Buttons";
 import { GridPhoto } from "../../utils/types";
-import { fetchLikedPhoto } from "../../redux/apiSlice";
-import { useAppDispatch } from "../../redux/hooks";
 import ChatBot from "../ChatBot/index";
 import PhotoCard from "../PhotoCard/index";
+import WallArtButton from "../WallArtButton/index";
 
 interface PhotoGalleryProps {
   photos: GridPhoto[];
@@ -39,6 +37,8 @@ const PhotoGallery = ({ photos, lastPhotoRef }: PhotoGalleryProps) => {
           alt=""
         />
       </PhotoViewer>
+
+      <WallArtButton isOpen = {isModalOpen} photoUrl={imgItem?.url} />
 
       {/* <ChatBot /> */}
     </div>
