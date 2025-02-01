@@ -6,6 +6,7 @@ import Main from "./components/Main";
 import { Provider } from "react-redux";
 import { store } from "./redux/store"; // Import store
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import WallArtSection from "./components/WallArtSection";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           {/* Routes */}
           <Routes>
             <Route path={"/"} element={<Main />} />
+            <Route path="/photo-section" element={<WallArtSection />} />
           </Routes>
           {/* Footer */}
           <Footer />
