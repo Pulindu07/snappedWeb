@@ -4,26 +4,64 @@ import { useSelector } from "react-redux";
 import { fetchPhotos } from "./../../redux/apiSlice";
 import { RootState } from "./../../redux/store";
 import { useAppDispatch } from "../../redux/hooks";
+import { MINIMUM_PAGES } from "../../utils/conts";
 
 const LandingPage = () => {
   const dispatch = useAppDispatch();
-  const { photos, loading, hasMore, currentPage } = useSelector(
+  const { photos, loading, hasMore, currentPage, totalPages } = useSelector(
     (state: RootState) => state.photos
   );
   const observer = useRef<IntersectionObserver | null>(null);
   const lastPhotoRef = useRef<HTMLDivElement | null>(null);
 
+  const [pageOrder, setPageOrder] = useState<number[]>([Math.floor(Math.random() * MINIMUM_PAGES) + 1]);
+  const [pageShuffled, setPageShuffled]= useState(false);
+
+  function updateListWithRandomOrder(pageOrder: number[], totalPages: number) {
+    // If already shuffled, return existing order
+    if (pageShuffled) {
+        return pageOrder;
+    }
+    
+    // Get the first number if pageOrder is not empty
+    const currentNumber = pageOrder.length > 0 ? pageOrder[0] : 1;
+    const lastElement = totalPages;
+
+    // Create array from 1 to totalPages
+    const numbersToAdd = Array.from({ length: totalPages }, (_, index) => index + 1)
+        .filter(num => num !== currentNumber && num !== lastElement);
+
+    // Fisher-Yates Shuffle
+    for (let i = numbersToAdd.length - 1; i > 0; i--) {
+        const randomIndex = Math.floor(Math.random() * (i + 1));
+        [numbersToAdd[i], numbersToAdd[randomIndex]] = [numbersToAdd[randomIndex], numbersToAdd[i]];
+    }
+
+    // Create the final order: shuffled numbers, last element
+    const newOrder = [...numbersToAdd, lastElement];
+    
+    // Update state
+    setPageShuffled(true);
+    setPageOrder(newOrder);
+    return newOrder;
+} 
+
   // Fetch the first page of photos when the component mounts
   useEffect(() => {
     if (!loading) {
-      dispatch(fetchPhotos(1)); // Load first page only once
+      dispatch(fetchPhotos(pageOrder[0])); // Load first page only once
     }
   }, []);
+  useEffect(()=>{
+    if(totalPages > 1){
+      updateListWithRandomOrder(pageOrder, totalPages);
+    }
+  },[totalPages]);
 
   // Use IntersectionObserver to trigger loading next page when the last photo is in view
   useEffect(() => {
     // Ensure there's a valid last photo to observe
-    if (loading || !hasMore || !lastPhotoRef.current) return;
+    if (loading || pageOrder.length===0 || !lastPhotoRef.current) return;
 
     // Disconnect any previous observer
     if (observer.current) observer.current.disconnect();
@@ -32,8 +70,9 @@ const LandingPage = () => {
     observer.current = new IntersectionObserver(
       (entries) => {
         const lastEntry = entries[0];
-        if (lastEntry.isIntersecting && hasMore) {
-          dispatch(fetchPhotos(currentPage)); // Load next page when last photo is in view
+        if (lastEntry.isIntersecting && pageOrder[0] && totalPages>1) {
+          dispatch(fetchPhotos(pageOrder[0])); // Load next page when last photo is in view
+          pageOrder.shift();
         }
       },
       { threshold: 1.0 } // Trigger when the last photo is fully visible
@@ -46,7 +85,7 @@ const LandingPage = () => {
     return () => {
       if (observer.current) observer.current.disconnect();
     };
-  }, [loading, hasMore, currentPage, dispatch]);
+  }, [loading, pageOrder, currentPage, dispatch]);
 
   return <PhotoGallery photos={photos} lastPhotoRef={lastPhotoRef} />;
 };
