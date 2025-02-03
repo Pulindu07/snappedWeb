@@ -53,6 +53,7 @@ interface PhotosState {
   hasMore: boolean;
   loading: boolean;
   error: string | null;
+  totalPages:number;
 }
 
 const initialState: PhotosState = {
@@ -61,6 +62,7 @@ const initialState: PhotosState = {
   hasMore: true,
   loading: false,
   error: null,
+  totalPages:1
 };
 
 const apiSlice = createSlice({
@@ -77,6 +79,7 @@ const apiSlice = createSlice({
         state.photos = [...state.photos, ...action.payload.photos];
         state.hasMore = action.payload.hasMore;
         state.currentPage += 1;
+        state.totalPages=action.payload.totalPages;
       })
       .addCase(fetchPhotos.rejected, (state, action) => {
         state.loading = false;
