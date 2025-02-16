@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
-import { ZoomIn, ZoomOut, Maximize2, XCircle } from "lucide-react";
+import { ZoomIn, ZoomOut, Maximize2 } from "lucide-react";
 import PhotoViewer from "./../PhotoViewer";
 import { ReactionButton } from "../Buttons";
 import { GridPhoto } from "../../utils/types";
@@ -71,13 +71,6 @@ const PhotoGallery = ({ photos, lastPhotoRef }: PhotoGalleryProps) => {
                   cursor:"move"
                 }}
               >
-              <button
-                  className="fixed top-0 right-0 p-2 rounded-full bg-black/20 hover:bg-white/20 transition-colors z-[9999]"
-                  onClick={closeModal}
-                  title="Close"
-                >
-                  <XCircle className="w-6 h-6 text-white" />
-                </button>
                 <img
                   className="rounded-lg shadow-md max-w-[90vw] max-h-[90vh] md:max-w-[85vw] md:max-h-[85vh] lg:max-w-[80vw] lg:max-h-[80vh]"
                   src={imgItem?.url}
