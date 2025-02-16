@@ -1,5 +1,6 @@
 import React,{useEffect, useCallback} from 'react';
 import { ModalProps } from './../types/types';
+import { XCircle } from 'lucide-react';
 
 const PhotoViewer: React.FC<{ isOpen: boolean, onClose: () => void, children: React.ReactNode }> = ({ isOpen, onClose, children }) => {
     
@@ -30,7 +31,16 @@ const PhotoViewer: React.FC<{ isOpen: boolean, onClose: () => void, children: Re
           className="bg-transparent rounded-lg shadow-lg"
           onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the modal
         >
-          <div className="w-full h-full">{children}</div>
+          <button
+            className="absolute top-0 right-0 p-2 rounded-full bg-black/20 hover:bg-white/20 transition-colors z-[9999]"
+            onClick={onClose}
+            title="Close"
+          >
+            <XCircle className="w-6 h-6 text-white" />
+          </button>
+          <div className="w-full h-full">
+            {children}
+          </div>
         </div>
       </div>
     );
