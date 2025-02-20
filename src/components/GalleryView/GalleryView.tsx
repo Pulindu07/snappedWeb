@@ -226,8 +226,8 @@ const Scene: React.FC<{ photos: GridPhoto[] }> = ({ photos }) => {
       <PerspectiveCamera makeDefault position={[0, 7, 10]} fov={60} />
       <OrbitControls 
         enableZoom={true}
-        maxDistance={5} // Allow further zoom out
-        minDistance={0.01} // Allow getting much closer to photos
+        maxDistance={10} // Allow further zoom out
+        minDistance={2} // Allow getting much closer to photos
         minPolarAngle={Math.PI / 2} // Lock vertical rotation
         maxPolarAngle={Math.PI / 2} // Lock vertical rotation
         enablePan={true} // Allow horizontal panning
