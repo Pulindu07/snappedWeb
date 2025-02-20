@@ -8,13 +8,15 @@ import { fetchLikedPhoto } from "../../redux/apiSlice";
 import { useAppDispatch } from "../../redux/hooks";
 import ChatBot from "../ChatBot/index";
 import PhotoCard from "../PhotoCard/index";
+import GalleryView from "../GalleryView/index";
 
 interface PhotoGalleryProps {
   photos: GridPhoto[];
+  allPhotos: GridPhoto[];
   lastPhotoRef: React.MutableRefObject<HTMLDivElement | null>;
 }
 
-const PhotoGallery = ({ photos, lastPhotoRef }: PhotoGalleryProps) => {
+const PhotoGallery = ({ photos, allPhotos, lastPhotoRef }: PhotoGalleryProps) => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [imgItem, setImgItem] = useState<GridPhoto | null>(null);
@@ -83,6 +85,7 @@ const PhotoGallery = ({ photos, lastPhotoRef }: PhotoGalleryProps) => {
       </PhotoViewer>
 
       {/* <ChatBot /> */}
+      <GalleryView photos={allPhotos} />
     </div>
   );
 };

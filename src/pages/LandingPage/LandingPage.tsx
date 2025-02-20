@@ -5,11 +5,15 @@ import { fetchPhotos } from "./../../redux/apiSlice";
 import { RootState } from "./../../redux/store";
 import { useAppDispatch } from "../../redux/hooks";
 import { MINIMUM_PAGES } from "../../utils/conts";
+import { fetchAllThePhotos } from "./../../redux/allPhotoSlice";
 
 const LandingPage = () => {
   const dispatch = useAppDispatch();
   const { photos, loading, hasMore, currentPage, totalPages } = useSelector(
     (state: RootState) => state.photos
+  );
+  const { allPhotos, allLoading, allHasMore, allCurrentPage, allTotalPages } = useSelector(
+    (state: RootState) => state.allPhotos
   );
   const observer = useRef<IntersectionObserver | null>(null);
   const lastPhotoRef = useRef<HTMLDivElement | null>(null);
@@ -50,6 +54,7 @@ const LandingPage = () => {
   useEffect(() => {
     if (!loading) {
       dispatch(fetchPhotos(pageOrder[0])); // Load first page only once
+      dispatch(fetchAllThePhotos(1)); // Load first page only once
     }
   }, []);
   useEffect(()=>{
@@ -87,7 +92,7 @@ const LandingPage = () => {
     };
   }, [loading, pageOrder, currentPage, dispatch]);
 
-  return <PhotoGallery photos={photos} lastPhotoRef={lastPhotoRef} />;
+  return <PhotoGallery photos={photos} allPhotos={allPhotos} lastPhotoRef={lastPhotoRef} />;
 };
 
 export default LandingPage;
