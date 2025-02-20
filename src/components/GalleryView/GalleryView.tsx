@@ -197,7 +197,7 @@ const Room: React.FC<{ photos: GridPhoto[] }> = ({ photos }) => {
             key={photo.id}
             position={frameData.position}
             rotation={frameData.rotation}
-            imageUrl={photo.url}
+            imageUrl={photo.prevUrl}
             photo={photo}
             index={index}
           />
