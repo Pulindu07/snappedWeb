@@ -7,7 +7,7 @@ const VrButton:React.FC<ClickButtonProps> = ({handleButtonClick}) =>{
             onClick={handleButtonClick}
             className="hover:bg-white p-1 rounded-full transition-colors"
         >
-            <svg fill="#000000" height="32px" width="32px" version="1.1" id="Icons" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+            <svg fill="black" height="48px" width="48px" version="1.1" id="Icons" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
                 <g>
                     <path d="M21.7,18H10.3C7.9,18,6,16.1,6,13.7V9.3C6,6.9,7.9,5,10.3,5h11.5C24.1,5,26,6.9,26,9.3v4.5C26,16.1,24.1,18,21.7,18z
                         M10.3,7C9,7,8,8,8,9.3v4.5C8,15,9,16,10.3,16h11.5c1.3,0,2.3-1,2.3-2.3V9.3C24,8,23,7,21.7,7H10.3z"/>
