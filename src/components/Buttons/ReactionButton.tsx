@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
-import {ReactionButtonProps} from "./../types/types";
+import { ReactionButtonProps } from "./../types/types";
 
 const ReactionButton: React.FC<ReactionButtonProps> = ({ isLiked, onToggle }) => {
   return (

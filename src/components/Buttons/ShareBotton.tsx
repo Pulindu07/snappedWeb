@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { FaHeart, FaShare } from "react-icons/fa";
 import {ShareButtonProps} from "./../types/types";
 
 const ShareButton: React.FC<ShareButtonProps> = ({ onClick }) => {
@@ -8,7 +7,7 @@ const ShareButton: React.FC<ShareButtonProps> = ({ onClick }) => {
         onClick={onClick}
         className="text-xl text-gray-600 hover:text-blue-500 focus:outline-none"
       >
-        <FaShare />
+        Share
       </button>
     );
   };

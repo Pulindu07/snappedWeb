@@ -9,7 +9,7 @@ const CommentButton: React.FC<CommentButtonProps> = ({ onClick }) => {
         onClick={onClick}
         className="text-xl text-gray-600 hover:text-gray-800 focus:outline-none"
       >
-        <FaRegComment />
+        Comment
       </button>
     );
   };
