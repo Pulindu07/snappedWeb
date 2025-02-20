@@ -29,3 +29,8 @@ export const likePhoto = async (id:number, hasLiked:boolean) => {
   });
   return response.data; // Returns the server's response
 };
+
+export const fetchAllPhotos = async (page: number): Promise<FetchPhotosResponse> => {
+  const response = await axios.get(`${configProcess.API_URL}/getPhotos?page=${page}&pageSize=1000`);
+  return response.data; // Ensure this matches the API's response format
+};
