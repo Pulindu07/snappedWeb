@@ -8,7 +8,7 @@ import { fetchLikedPhoto } from "../../redux/apiSlice";
 import { useAppDispatch } from "../../redux/hooks";
 import ChatBot from "../ChatBot/index";
 import PhotoCard from "../PhotoCard/index";
-import GalleryView from "../GalleryView/index";
+import {GalleryView, GalleryScene} from "../GalleryView/index";
 
 interface PhotoGalleryProps {
   photos: GridPhoto[];
@@ -85,7 +85,8 @@ const PhotoGallery = ({ photos, allPhotos, lastPhotoRef }: PhotoGalleryProps) =>
       </PhotoViewer>
 
       {/* <ChatBot /> */}
-      <GalleryView photos={allPhotos} />
+      {/* <GalleryView photos={allPhotos} /> */}
+      <GalleryScene photos={allPhotos} />
     </div>
   );
 };

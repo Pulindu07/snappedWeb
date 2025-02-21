@@ -1,3 +1,4 @@
 import GalleryView from "./GalleryView";
+import GalleryScene from "./GalleryScene";
 
-export default GalleryView;
+export {GalleryView, GalleryScene};

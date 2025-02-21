@@ -73,7 +73,7 @@ const Frame: React.FC<FrameProps & { photo: GridPhoto }> = ({ position, rotation
 const Room: React.FC<{ photos: GridPhoto[] }> = ({ photos }) => {
   const FRAME_SPACING = 6;
   const WALL_OFFSET = 0.3;
-  const ROW_HEIGHT = 6;
+  const ROW_HEIGHT = 2;
   const SECOND_ROW_HEIGHT = 12;
   
   const roomSize = useMemo(() => {
