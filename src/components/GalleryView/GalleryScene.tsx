@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import * as THREE from "three";
-import { Canvas } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import {
   OrbitControls,
   PerspectiveCamera,
@@ -21,6 +21,140 @@ interface FrameProps {
   photo: PhotoData;
   index: number;
 }
+
+// New component for first-person controls
+const FirstPersonControls = () => {
+  const { camera } = useThree();
+  const moveState = useRef({
+    forward: 0,
+    backward: 0,
+    left: 0,
+    right: 0,
+    up: 0,
+    down: 0
+  });
+  const mouseState = useRef({
+    isDown: false,
+    x: 0,
+    y: 0
+  });
+  const rotationY = useRef(0);
+  const rotationX = useRef(0);  // For vertical tilt
+  const MAX_TILT = Math.PI / 3; // Maximum vertical tilt angle (about 60 degrees)
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      switch (e.key.toLowerCase()) {
+        case 'w': moveState.current.forward = 1; break;
+        case 's': moveState.current.backward = 1; break;
+        case 'a': moveState.current.left = 1; break;
+        case 'd': moveState.current.right = 1; break;
+        case 'q': moveState.current.up = 1; break;    // Move up
+        case 'e': moveState.current.down = 1; break;  // Move down
+      }
+    };
+
+    const handleKeyUp = (e: KeyboardEvent) => {
+      switch (e.key.toLowerCase()) {
+        case 'w': moveState.current.forward = 0; break;
+        case 's': moveState.current.backward = 0; break;
+        case 'a': moveState.current.left = 0; break;
+        case 'd': moveState.current.right = 0; break;
+        case 'q': moveState.current.up = 0; break;
+        case 'e': moveState.current.down = 0; break;
+      }
+    };
+
+    const handleMouseDown = (e: MouseEvent) => {
+      mouseState.current.isDown = true;
+      mouseState.current.x = e.clientX;
+      mouseState.current.y = e.clientY;
+    };
+
+    const handleMouseUp = () => {
+      mouseState.current.isDown = false;
+    };
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (mouseState.current.isDown) {
+        const deltaX = e.clientX - mouseState.current.x;
+        const deltaY = e.clientY - mouseState.current.y;
+        
+        // Horizontal rotation
+        rotationY.current -= deltaX * 0.01;
+        
+        // Vertical rotation (tilt) with limits
+        // rotationX.current -= deltaY * 0.01;
+        // rotationX.current = Math.max(-MAX_TILT, Math.min(MAX_TILT, rotationX.current));
+        
+        mouseState.current.x = e.clientX;
+        mouseState.current.y = e.clientY;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+    window.addEventListener('mousedown', handleMouseDown);
+    window.addEventListener('mouseup', handleMouseUp);
+    window.addEventListener('mousemove', handleMouseMove);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+      window.removeEventListener('mousedown', handleMouseDown);
+      window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, []);
+
+  useFrame(() => {
+    const speed = 0.15;
+    const movement = new THREE.Vector3();
+    
+    // Calculate horizontal movement
+    if (moveState.current.forward) movement.z -= speed;
+    if (moveState.current.backward) movement.z += speed;
+    if (moveState.current.left) movement.x -= speed;
+    if (moveState.current.right) movement.x += speed;
+
+    // Calculate vertical movement
+    if (moveState.current.up) movement.y += speed;
+    if (moveState.current.down) movement.y -= speed;
+
+    // Apply rotation to horizontal movement only
+    const horizontalMovement = new THREE.Vector3(movement.x, 0, movement.z)
+      .applyAxisAngle(new THREE.Vector3(0, 1, 0), rotationY.current);
+
+    // Combine with vertical movement
+    const finalMovement = new THREE.Vector3(
+      horizontalMovement.x,
+      movement.y,
+      horizontalMovement.z
+    );
+
+    // Get current room boundaries (adjust these values based on your room size)
+    const roomLimits = {
+      x: 24, // Half the room width
+      y: 9,  // Room height
+      z: 24  // Half the room depth
+    };
+
+    // Calculate new position with collision detection
+    const newPosition = camera.position.clone().add(finalMovement);
+    
+    // Apply boundary limits with buffer
+    const buffer = 1; // Buffer distance from walls
+    newPosition.x = Math.max(-roomLimits.x + buffer, Math.min(roomLimits.x - buffer, newPosition.x));
+    newPosition.y = Math.max(1, Math.min(roomLimits.y - buffer, newPosition.y)); // Minimum height of 1
+    newPosition.z = Math.max(-roomLimits.z + buffer, Math.min(roomLimits.z - buffer, newPosition.z));
+
+    // Update camera position and rotation
+    camera.position.copy(newPosition);
+    camera.rotation.set(rotationX.current, rotationY.current, 0, 'YXZ');
+  });
+
+  return null;
+};
 
 const Frame: React.FC<FrameProps> = ({ position, rotation, photo, index }) => {
   const texture = useTexture(photo.url);
@@ -245,7 +379,25 @@ const Room: React.FC<{ photos: PhotoData[] }> = ({ photos }) => {
         );
       })}
 
-      {/* Lighting setup remains the same */}
+<group>
+        <mesh position={[0, 0, -roomSize.depth/2]} visible={false}>
+          <boxGeometry args={[roomSize.width, roomSize.height, 1]} />
+          <meshBasicMaterial transparent opacity={0} />
+        </mesh>
+        <mesh position={[0, 0, roomSize.depth/2]} visible={false}>
+          <boxGeometry args={[roomSize.width, roomSize.height, 1]} />
+          <meshBasicMaterial transparent opacity={0} />
+        </mesh>
+        <mesh position={[-roomSize.width/2, 0, 0]} rotation={[0, Math.PI/2, 0]} visible={false}>
+          <boxGeometry args={[roomSize.depth, roomSize.height, 1]} />
+          <meshBasicMaterial transparent opacity={0} />
+        </mesh>
+        <mesh position={[roomSize.width/2, 0, 0]} rotation={[0, -Math.PI/2, 0]} visible={false}>
+          <boxGeometry args={[roomSize.depth, roomSize.height, 1]} />
+          <meshBasicMaterial transparent opacity={0} />
+        </mesh>
+      </group>
+
     </group>
   );
 };
@@ -269,10 +421,6 @@ const GalleryScene: React.FC<{ photos: PhotoData[] }> = ({ photos }) => {
     setIsLoading(true);
   };
 
-  const handleSceneLoaded = () => {
-    setTimeout(() => setIsLoading(false), 800);
-  };
-
   return (
     <>
       <div className="fixed bottom-6 right-6 z-50 bg-cyan-600 hover:bg-white text-white rounded-full shadow-lg transition-all hover:scale-105 backdrop-blur-sm">
@@ -290,24 +438,13 @@ const GalleryScene: React.FC<{ photos: PhotoData[] }> = ({ photos }) => {
 
           {isLoading && <LoadingScreen />}
           <Canvas shadows>
-            <PerspectiveCamera makeDefault position={[0, 7, 10]} fov={60} />
-            <OrbitControls
-              enableZoom={true}
-              maxDistance={20}
-              minDistance={1}
-              minPolarAngle={Math.PI / 4}
-              maxPolarAngle={Math.PI / 2}
-              enablePan={true}
-              enableRotate={true}
-              target={[0, 5, 0]}
-            />
-            <ambientLight intensity={0.6} />
+            <PerspectiveCamera makeDefault position={[0, 5, 10]} fov={75} />
+            <FirstPersonControls />
             <Room photos={photos} />
+            <ambientLight intensity={0.6} />
           </Canvas>
           <div className="absolute bottom-4 left-4 text-white/70 text-sm">
-            <p>
-              Drag to rotate • Scroll to zoom closer • Right-click + drag to pan
-            </p>
+            <p>WASD keys to move • Q/E to move up/down • Click and drag to look around</p>
           </div>
         </div>
       )}
