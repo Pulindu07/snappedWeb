@@ -33,7 +33,6 @@ const ChatBot: React.FC = () => {
 
   const handleSendMessage = async () => {
     if (input.trim() && sessionId) {
-      console.log("sessionId",sessionId);
       const msg = input;
       setInput("");
       setMessages(prev => [...prev, { role: "user", content: msg }]);

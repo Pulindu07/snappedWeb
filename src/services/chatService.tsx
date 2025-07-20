@@ -33,7 +33,6 @@ export interface ChatResponse {
 
 const chatServiceSendMessage = {
   async sendMessage(data: SendMessageRequest): Promise<ChatResponse> {
-    console.log("url: ",  `${configProcess.CHAT_URL}/api/Chat/message`);
     const response = await axios.post<ChatResponse>(
       `${configProcess.CHAT_URL}/api/Chat/message`,
       data
