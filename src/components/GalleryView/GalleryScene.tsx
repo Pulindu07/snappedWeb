@@ -423,7 +423,7 @@ const GalleryScene: React.FC<{ photos: PhotoData[] }> = ({ photos }) => {
 
   return (
     <>
-      <div className="fixed bottom-6 right-6 z-50 bg-cyan-600 hover:bg-white text-white rounded-full shadow-lg transition-all hover:scale-105 backdrop-blur-sm">
+      <div className="fixed bottom-2 left-6 z-50 bg-cyan-600 hover:bg-white text-white rounded-full shadow-lg transition-all hover:scale-105 backdrop-blur-sm">
         <VrButton handleButtonClick={handleGalleryOpen} />
       </div>
 

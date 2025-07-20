@@ -1,6 +1,6 @@
 {
     "API_URL": "http://localhost:5237/api",
-    "DEFAULT_PAGE_SIZE":6
-    
+    "DEFAULT_PAGE_SIZE":6,
+    "VITE_CHAT_API_URL":"http://localhost:5086"
 }
   

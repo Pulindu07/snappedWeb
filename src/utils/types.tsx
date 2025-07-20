@@ -27,3 +27,28 @@ export interface Photo {
     timestamp: string;
     sessionId: string;
   }
+
+  export interface ChatMessage {
+    id?: number;
+    role: 'user' | 'assistant';
+    content: string;
+    createdAt?: string;
+  }
+  
+  export interface PhotoReference {
+    id: number;
+    title: string;
+    blobUrl: string;
+    relevanceScore: number;
+  }
+  
+  export interface ChatResponse {
+    response: string;
+    sessionId: string;
+    referencedPhotos?: PhotoReference[];
+  }
+  
+  export interface ChatRequest {
+    message: string;
+    sessionId?: string;
+  }

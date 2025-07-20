@@ -2,26 +2,53 @@ import axios from "axios";
 
 const configProcess = {
     API_URL: import.meta.env.VITE_BASE_API_URL,
-    DEFAULT_PAGE_SIZE: Number(import.meta.env.VITE_DEFAULT_PAGE_SIZE)
+    DEFAULT_PAGE_SIZE: Number(import.meta.env.VITE_DEFAULT_PAGE_SIZE),
+    CHAT_URL: import.meta.env.VITE_CHAT_API_URL,
   };
 
-interface SendMessageRequest {
+export interface ChatMessage {
+  id?: number;
+  role: 'user' | 'assistant';
   content: string;
-  conversationId: string;
+  createdAt?: string;
 }
 
-interface SendMessageResponse {
-  reply: string;
+interface SendMessageRequest {
+  message: string;
+  sessionId: string;
 }
 
-const chatService = {
-  async sendMessage(data: SendMessageRequest): Promise<SendMessageResponse> {
-    const response = await axios.post<SendMessageResponse>(
-      `${configProcess.API_URL}/chat-bot`,
+export interface PhotoReference {
+  id: number;
+  title: string;
+  blobUrl: string;
+  relevanceScore: number;
+}
+
+export interface ChatResponse {
+  response: string;
+  sessionId: string;
+  referencedPhotos?: PhotoReference[];
+}
+
+const chatServiceSendMessage = {
+  async sendMessage(data: SendMessageRequest): Promise<ChatResponse> {
+    const response = await axios.post<ChatResponse>(
+      `${configProcess.CHAT_URL}/api/Chat/message`,
       data
     );
     return response.data;
   },
 };
 
-export default chatService;
+const chatServiceGetChatHistory = {
+  async sendMessage(sessionId: string): Promise<ChatMessage[]> {
+    const response = await axios.get<ChatMessage[]>(
+      `${configProcess.CHAT_URL}/api/Chat/history/${sessionId}`
+    );
+    return response.data;
+  },
+};
+
+
+export { chatServiceSendMessage, chatServiceGetChatHistory };

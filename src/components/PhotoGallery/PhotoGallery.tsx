@@ -84,7 +84,7 @@ const PhotoGallery = ({ photos, allPhotos, lastPhotoRef }: PhotoGalleryProps) =>
         </TransformWrapper>
       </PhotoViewer>
 
-      {/* <ChatBot /> */}
+      <ChatBot />
       {/* <GalleryView photos={allPhotos} /> */}
       <GalleryScene photos={allPhotos} />
     </div>

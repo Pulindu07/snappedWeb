@@ -1,75 +1,59 @@
 import React, { useEffect, useState, useRef } from "react";
-import { HubConnectionBuilder, HubConnectionState, HttpTransportType } from "@microsoft/signalr";
-import { useDispatch, useSelector } from "react-redux";
-import ReactMarkdown from 'react-markdown';
-import { RootState, AppDispatch } from "./../../redux/store";
-import { addUserMessage, addBotMessage } from "./../../redux/chatSlice";
 import { SendButton, CloseButton } from "../Buttons";
 import LoadingDots from "../LoadingDots";
 import Markdown from "react-markdown";
+import { chatServiceSendMessage, chatServiceGetChatHistory } from '../../services/chatService';
+import { ChatMessage } from '../../utils/types';
 
 const ChatBot: React.FC = () => {
-  const dispatch = useDispatch<AppDispatch>();
-  const { messages, loading } = useSelector((state: RootState) => state.chat);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [sessionId, setSessionId] = useState<string | null>(null);
   const [input, setInput] = useState("");
   const [isChatVisible, setIsChatVisible] = useState(false);
-  const [connection, setConnection] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
 
-  const configProcess = {
-    BASE_API_URL: import.meta.env.VITE_BASE_API_URL,
-  };
-
+  // Generate session ID on first load if not present
   useEffect(() => {
-    const initializeSignalRConnection = async () => {
-      try {
-        const hubConnection = new HubConnectionBuilder()
-          .withUrl(`${configProcess.BASE_API_URL}/chat-bot`, {
-            skipNegotiation: true,
-            transport: HttpTransportType.WebSockets,
-            withCredentials: true
-          })
-          .withAutomaticReconnect()
-          .build();
-
-        hubConnection.on("ReceiveMessage", (message: string) => {
-          dispatch(addBotMessage(message));
-        });
-
-        await hubConnection.start();
-        setConnection(hubConnection);
-      } catch (error) {
-        console.error("SignalR Connection Error:", error);
-      }
-    };
-
-    if (!connection) {
-      initializeSignalRConnection();
+    if (!sessionId) {
+      setSessionId(Date.now().toString());
     }
+  }, [sessionId]);
 
-    return () => {
-      if (connection?.state === HubConnectionState.Connected) {
-        connection.stop();
-      }
-    };
-  }, [dispatch, connection]);
+  // Load chat history when opening chat
+  useEffect(() => {
+    if (isChatVisible && sessionId && messages.length === 0) {
+      setLoading(true);
+      chatServiceGetChatHistory.sendMessage(sessionId)
+        .then(history => setMessages(history))
+        .catch(() => setMessages([]))
+        .finally(() => setLoading(false));
+    }
+  }, [isChatVisible, sessionId, messages.length]);
 
   const handleSendMessage = async () => {
-    if (input.trim() && connection) {
-      let tempInput = input;
+    if (input.trim() && sessionId) {
+      console.log("sessionId",sessionId);
+      const msg = input;
       setInput("");
+      setMessages(prev => [...prev, { role: "user", content: msg }]);
+      setLoading(true);
       try {
-        dispatch(addUserMessage(tempInput));
-        await connection.invoke("SendMessage", tempInput, "conversation-1");
+        const response = await chatServiceSendMessage.sendMessage({ message: msg, sessionId });
+        setSessionId(response.sessionId); // In case backend returns a new sessionId
+        setMessages(prev => [...prev, { role: "assistant", content: response.response }]);
       } catch (error) {
-        console.error("Message send error:", error);
+        console.log(error);
+        setMessages(prev => [...prev, { role: "assistant", content: "Sorry, something went wrong." }]);
+      } finally {
+        setLoading(false);
       }
     }
   };
 
-  const closeChat=()=>{
-    setIsChatVisible(false)
-  }
+  const closeChat = () => {
+    setIsChatVisible(false);
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -141,7 +125,7 @@ const ChatBot: React.FC = () => {
               placeholder="Type a message..."
               className="flex-grow p-3 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-300 transition-all mr-1"
             />
-              <SendButton handleSendMessage={handleSendMessage} loading={loading} />
+            <SendButton handleSendMessage={handleSendMessage} loading={loading} />
           </div>
         </div>
       )}
