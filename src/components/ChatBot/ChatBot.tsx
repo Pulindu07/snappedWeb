@@ -1,52 +1,29 @@
 import React, { useEffect, useState, useRef } from "react";
+import { useAppDispatch, useAppSelector } from '../../redux/hooks';
+import { addUserMessage, sendChatMessage, fetchChatHistory } from "../../redux/chatSlice";
 import { SendButton, CloseButton } from "../Buttons";
 import LoadingDots from "../LoadingDots";
 import Markdown from "react-markdown";
-import { chatServiceSendMessage, chatServiceGetChatHistory } from '../../services/chatService';
-import { ChatMessage } from '../../utils/types';
 
 const ChatBot: React.FC = () => {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [sessionId, setSessionId] = useState<string | null>(null);
+  const dispatch = useAppDispatch();
+  const { messages, chatLoading, sessionId } = useAppSelector((state) => state.chat);
   const [input, setInput] = useState("");
   const [isChatVisible, setIsChatVisible] = useState(false);
-  const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
-
-  // Generate session ID on first load if not present
-  useEffect(() => {
-    if (!sessionId) {
-      setSessionId(Date.now().toString());
-    }
-  }, [sessionId]);
 
   // Load chat history when opening chat
   useEffect(() => {
     if (isChatVisible && sessionId && messages.length === 0) {
-      setLoading(true);
-      chatServiceGetChatHistory.sendMessage(sessionId)
-        .then(history => setMessages(history))
-        .catch(() => setMessages([]))
-        .finally(() => setLoading(false));
+      dispatch(fetchChatHistory(sessionId));
     }
-  }, [isChatVisible, sessionId, messages.length]);
+  }, [isChatVisible, sessionId, messages.length, dispatch]);
 
-  const handleSendMessage = async () => {
-    if (input.trim() && sessionId) {
-      const msg = input;
+  const handleSendMessage = () => {
+    if (input.trim()) {
+      dispatch(addUserMessage(input));
+      dispatch(sendChatMessage({ message: input, sessionId: sessionId || Date.now().toString() }));
       setInput("");
-      setMessages(prev => [...prev, { role: "user", content: msg }]);
-      setLoading(true);
-      try {
-        const response = await chatServiceSendMessage.sendMessage({ message: msg, sessionId });
-        setSessionId(response.sessionId); // In case backend returns a new sessionId
-        setMessages(prev => [...prev, { role: "assistant", content: response.response }]);
-      } catch (error) {
-        console.log(error);
-        setMessages(prev => [...prev, { role: "assistant", content: "Sorry, something went wrong." }]);
-      } finally {
-        setLoading(false);
-      }
     }
   };
 
@@ -97,6 +74,9 @@ const ChatBot: React.FC = () => {
           </div>
 
           <div className="h-[300px] overflow-y-auto p-3 space-y-2">
+            {messages.length === 0 && !chatLoading && (
+              <div className="text-gray-400 text-center">Say hi to Snap Bot!</div>
+            )}
             {messages.map((msg, index) => (
               <div 
                 key={index} 
@@ -109,7 +89,7 @@ const ChatBot: React.FC = () => {
                 <Markdown>{msg.content}</Markdown>
               </div>
             ))}
-            {loading && (
+            {chatLoading && messages.length > 0 && (
               <LoadingDots />
             )}
             <div ref={messagesEndRef} />
@@ -124,7 +104,7 @@ const ChatBot: React.FC = () => {
               placeholder="Type a message..."
               className="flex-grow p-3 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-300 transition-all mr-1"
             />
-            <SendButton handleSendMessage={handleSendMessage} loading={loading} />
+            <SendButton handleSendMessage={handleSendMessage} loading={chatLoading} />
           </div>
         </div>
       )}
