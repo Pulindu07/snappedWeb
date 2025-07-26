@@ -134,9 +134,9 @@ const FirstPersonControls = () => {
 
     // Get current room boundaries (adjust these values based on your room size)
     const roomLimits = {
-      x: 24, // Half the room width
+      x: 100, // Half the room width
       y: 9,  // Room height
-      z: 24  // Half the room depth
+      z: 100  // Half the room depth
     };
 
     // Calculate new position with collision detection
@@ -166,7 +166,7 @@ const Frame: React.FC<FrameProps> = ({ position, rotation, photo, index }) => {
       const { image } = texture;
       const isLandscape = image.width > image.height;
 
-      setDimensions(isLandscape ? [9, 6] : [6, 9]);
+      setDimensions(isLandscape ? [27, 18] : [18, 27]);
 
       texture.minFilter = THREE.LinearFilter;
       texture.generateMipmaps = false;
@@ -195,8 +195,8 @@ const Frame: React.FC<FrameProps> = ({ position, rotation, photo, index }) => {
       </mesh>
 
       <Text
-        position={[0, -dimensions[1] / 2 - 0.3, 0]}
-        fontSize={0.2}
+        position={[0, -dimensions[1] / 1.8 - 0.3, 0]}
+        fontSize={1}
         color="#ffffff"
         anchorX="center"
         anchorY="middle"
@@ -208,16 +208,16 @@ const Frame: React.FC<FrameProps> = ({ position, rotation, photo, index }) => {
 };
 
 const Room: React.FC<{ photos: PhotoData[] }> = ({ photos }) => {
-  const FRAME_SPACING = 10;
+  const FRAME_SPACING = 30;
   const WALL_OFFSET = 0.3;
   const ROW_HEIGHT = 2;
   const SECOND_ROW_HEIGHT = 12;
 
   const roomSize = useMemo(
     () => ({
-      width: Math.max(50, Math.ceil(photos.length / 4) * FRAME_SPACING),
-      height: 20,
-      depth: Math.max(20, Math.ceil(photos.length / 4) * FRAME_SPACING),
+      width: Math.max(90, Math.ceil(photos.length / 4) * FRAME_SPACING),
+      height: 36,
+      depth: Math.max(22, Math.ceil(photos.length / 4) * FRAME_SPACING),
     }),
     [photos.length]
   );
